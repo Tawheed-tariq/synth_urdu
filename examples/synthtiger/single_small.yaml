@@ -1,0 +1,144 @@
+coord_output: true
+mask_output: true
+glyph_coord_output: true
+glyph_mask_output: true
+vertical: false
+quality: [85, 95]
+visibility_check: true
+midground: 0.15
+midground_offset:
+  percents: [[-0.2, 0.2], [-0.2, 0.2]]  # Reduced offset for smaller images
+foreground_mask_pad: 2  # Reduced padding for smaller images
+corpus:
+  weights: [1, 0]
+  args:
+    # length augmentable corpus - Urdu text
+    - paths: [resources/corpus/urdu_tune.txt, resources/corpus/urdu_tune.txt]
+      weights: [1, 1]
+      min_length: 1  # Single word generation
+      max_length: 5  # Reduced max length for small images
+      textcase: [normal]  # Use normal case for Urdu
+      augmentation: 0.05
+      augmentation_length: [1, 5]  # Reduced length for smaller images
+    - paths: []
+      weights: []
+      min_length: 1
+      max_length: 5
+      textcase: [normal]
+      augmentation: 0
+      augmentation_charset: resources/charset/urdu_52.txt
+font:
+  paths: [resources/font_urdu/]
+  weights: [2]
+  size: [28, 36]  # Significantly reduced font size for small images
+  bold: 0.3  # Reduced boldness to maintain clarity at small sizes
+texture:
+  prob: 0.2  # Reduced texture probability
+  args:
+    paths: [resources/image/]
+    weights: [1]
+    alpha: [0, 0.2]  # Reduced alpha for cleaner small text
+    grayscale: 0.7  # Favor grayscale textures for cleaner text
+    crop: 1
+colormap2:
+  paths: [resources/colormap/colormap.txt]
+  weights: [1]
+  k: 2
+  alpha: [1, 1]
+  colorize: 1
+color:
+  gray: [0, 180]  # Ensure good contrast for small text
+  alpha: [1, 1]
+  colorize: 1
+shape:
+  prob: 0.3  # Further reduced probability of shape distortion
+  args:
+    weights: [1, 0]
+    args:
+      # Very mild elastic distortion - critical for small text
+      - alpha: [0.5, 2]  # Minimal distortion to maintain readability
+        sigma: [2, 4]  # Reduced sigma
+      # Removed second distortion
+layout:
+  weights: [10, 0]  # Only use flow layout for small connected text
+  args:
+    # flow layout - critical for connected scripts
+    - space: [-3, -1]  # Negative space to ensure characters connect
+      line_align: [middle]
+    # Removed curve layout for small images
+    - curve: [0, 0]
+      space: [0, 0]
+      convex: 0
+      upward: 0
+style:
+  prob: 0.05  # Minimal styling for small text
+  args:
+    weights: [1, 0, 0]  # Only allow minimal borders
+    args:
+      # text border - very minimal
+      - size: [1, 1]  # Minimal border size
+        alpha: [0.5, 0.7]
+        grayscale: 0
+      # Removed shadow and extrusion
+      - distance: [0, 0]
+        angle: [0, 0]
+        alpha: [0, 0]
+        grayscale: 0
+transform:
+  prob: 0.2  # Minimal transformations for small images
+  args:
+    weights: [0, 0, 0, 0, 0, 0, 1]  # Only allow minimal rotation
+    args:
+      # Removed perspective x
+      - percents: [[0, 0], [0, 0]]
+        aligns: [[0, 0], [0, 0]]
+      # Removed perspective y
+      - percents: [[0, 0], [0, 0]]
+        aligns: [[0, 0], [0, 0]]
+      # Removed trapezoidate x
+      - weights: [0, 0, 0, 0]
+        percent: [0, 0]
+        align: [0, 0]
+      # Removed trapezoidate y
+      - weights: [0, 0, 0, 0]
+        percent: [0, 0]
+        align: [0, 0]
+      # Removed skew x
+      - weights: [0, 0]
+        angle: [0, 0]
+        ccw: 0
+      # Removed skew y
+      - weights: [0, 0]
+        angle: [0, 0]
+        ccw: 0
+      # Minimal rotation
+      - angle: [0, 0.5]  # Very minimal rotation
+        ccw: 0.5
+pad:
+  prob: 1
+  args:
+    pxs: [[2, 5], [2, 5], [2, 5], [2, 5]]  # Minimal padding for small images
+size:
+  # Define target size explicitly
+  width: [95, 105]  # Target width around 100px
+  height: [95, 105]  # Target height around 100px
+  fit: contain  # Ensure entire text fits in the image
+postprocess:
+  args:
+    # gaussian noise - minimal
+    - prob: 0.2
+      args:
+        scale: [0.5, 1.5]  # Reduced noise for small images
+        per_channel: 0
+    # gaussian blur - very minimal
+    - prob: 0.1
+      args:
+        sigma: [0, 0.5]  # Minimal blur
+    # resample - removed
+    - prob: 0
+      args:
+        size: [0, 0]
+    # median blur - removed
+    - prob: 0
+      args:
+        k: [0, 0]

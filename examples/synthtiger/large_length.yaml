@@ -1,0 +1,167 @@
+coord_output: true
+mask_output: true
+glyph_coord_output: true
+glyph_mask_output: true
+vertical: false
+quality: [80, 90]  # Slightly reduced quality to allow for noise
+visibility_check: true
+midground: 0.15
+midground_offset:
+  percents: [[-0.2, 0.2], [-0.2, 0.2]]
+foreground_mask_pad: 2
+corpus:
+  weights: [1, 0]
+  args:
+    # length augmentable corpus - Urdu text
+    - paths: [resources/corpus/urdu.txt, resources/corpus/urdu.txt]
+      weights: [1, 1]
+      min_length: 80
+      max_length: 120
+      textcase: [normal]
+      augmentation: 0.05
+      augmentation_length: [80, 120]
+    - paths: []
+      weights: []
+      min_length: 80
+      max_length: 120
+      textcase: [normal]
+      augmentation: 0
+      augmentation_charset: resources/charset/urdu_52.txt
+font:
+  paths: [resources/font_urdu/]
+  weights: [1]
+  size: [28, 36]
+  bold: 0.3
+texture:
+  prob: 0.6  # Increased texture probability for more visual noise
+  args:
+    paths: [resources/image/]
+    weights: [1]
+    alpha: [0.1, 0.3]  # Increased alpha for more visible textures
+    grayscale: 0.6
+    crop: 1
+colormap2:
+  paths: [resources/colormap/colormap.txt]
+  weights: [1]
+  k: 2
+  alpha: [1, 1]
+  colorize: 1
+color:
+  gray: [0, 180]
+  alpha: [1, 1]
+  colorize: 1
+shape:
+  prob: 0.4  # Increased shape distortion probability
+  args:
+    weights: [1, 1]  # Added back second distortion for more noise
+    args:
+      # Mild elastic distortion
+      - alpha: [1, 3]  # Slightly increased distortion
+        sigma: [2, 4]
+      # Very mild second distortion for noise
+      - alpha: [0, 1]
+        sigma: [0, 0.5]
+layout:
+  weights: [10, 0]
+  args:
+    # flow layout for connected scripts
+    - space: [-3, -1]
+      line_align: [middle]
+    # Removed curve layout
+    - curve: [0, 0]
+      space: [0, 0]
+      convex: 0
+      upward: 0
+style:
+  prob: 0.2  # Increased styling probability
+  args:
+    weights: [1, 1, 0]  # Added back shadow for more noise
+    args:
+      # text border - subtle
+      - size: [1, 2]
+        alpha: [0.4, 0.6]
+        grayscale: 0
+      # text shadow - subtle noise
+      - distance: [1, 2]
+        angle: [0, 360]
+        alpha: [0.1, 0.3]
+        grayscale: 0
+transform:
+  prob: 0.3  # Increased transformation probability
+  args:
+    weights: [1, 1, 0, 0, 0, 0, 1]  # Re-added perspective transforms
+    args:
+      # perspective x - minimal
+      - percents: [[0.95, 1], [1, 1]]
+        aligns: [[0, 0], [0, 0]]
+      # perspective y - minimal
+      - percents: [[1, 1], [0.95, 1]]
+        aligns: [[0, 0], [0, 0]]
+      # trapezoidate x - removed
+      - weights: [0, 0, 0, 0]
+        percent: [0, 0]
+        align: [0, 0]
+      # trapezoidate y - removed
+      - weights: [0, 0, 0, 0]
+        percent: [0, 0]
+        align: [0, 0]
+      # skew x - removed
+      - weights: [0, 0]
+        angle: [0, 0]
+        ccw: 0
+      # skew y - removed
+      - weights: [0, 0]
+        angle: [0, 0]
+        ccw: 0
+      # rotation - minimal
+      - angle: [0, 1]  # Increased rotation slightly
+        ccw: 0.5
+pad:
+  prob: 1
+  args:
+    pxs: [[2, 5], [2, 5], [2, 5], [2, 5]]
+size:
+  width: [95, 105]
+  height: [95, 105]
+  fit: contain
+postprocess:
+  args:
+    # gaussian noise - increased
+    - prob: 0.7  # Increased probability
+      args:
+        scale: [2, 4]  # Increased noise scale
+        per_channel: 0.3  # Added some per-channel noise
+    # gaussian blur - mild
+    - prob: 0.3  # Increased blur probability
+      args:
+        sigma: [0, 1]  # Slightly increased blur
+    # resample - added subtle resampling
+    - prob: 0.15
+      args:
+        size: [0.8, 0.9]  # Subtle downsampling for noise
+    # median blur - added back minimal
+    - prob: 0.2
+      args:
+        k: [1, 1]
+    # JPEG compression noise
+    - prob: 0.4  # Added JPEG compression for noise
+      args:
+        quality: [70, 90]
+    # Salt and pepper noise
+    - prob: 0.3  # Added salt and pepper noise
+      args:
+        p: [0.01, 0.03]  # Low probability for subtle effect
+        per_channel: 0.2
+noise:
+  prob: 0.7  # Added explicit noise effect
+  args:
+    weights: [1, 1]
+    args:
+      # Random noise
+      - type: random
+        scale: [5, 15]
+        per_channel: 0.3
+      # Speckle noise
+      - type: speckle
+        scale: [0.05, 0.3]
+        per_channel: 0.4

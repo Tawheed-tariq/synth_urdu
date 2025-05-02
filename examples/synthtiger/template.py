@@ -312,7 +312,7 @@ def _check_visibility(image, mask):
     for y in range(height):
         for x in range(width):
             if peak[y][x]:
-                cv2.floodFill(gray, visit, (x, y), 1, 16, 16, flag)
+                cv2.floodFill(gray, visit, (x, y), 1, 0, 32, flag)
 
     visit = visit[1:-1, 1:-1]
     count = np.sum(visit & border)
